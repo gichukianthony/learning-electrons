@@ -5,55 +5,55 @@ import renderer from 'vite-plugin-electron-renderer'
 import { resolve } from 'path'
 
 export default defineConfig({
-  plugins: [
-    react(),
-    electron([
-      {
-        entry: 'electron/main.ts',
-        onstart(options) {
-          if (process.env.VSCODE_DEBUG) {
-            console.log('[startup] Electron App')
-          } else {
-            options.startup()
-          }
-        },
-        vite: {
-          build: {
-            sourcemap: true,
-            minify: false,
-            outDir: 'dist-electron',
-            rollupOptions: {
-              external: ['electron']
+    plugins: [
+        react(),
+        electron([
+            {
+                entry: 'electron/main.ts',
+                onstart(options) {
+                    if (process.env.VSCODE_DEBUG) {
+                        console.log('[startup] Electron App')
+                    } else {
+                        options.startup()
+                    }
+                },
+                vite: {
+                    build: {
+                        sourcemap: true,
+                        minify: false,
+                        outDir: 'dist-electron',
+                        rollupOptions: {
+                            external: ['electron']
+                        }
+                    }
+                }
+            },
+            {
+                entry: 'electron/preload.ts',
+                onstart(options) {
+                    options.reload()
+                },
+                vite: {
+                    build: {
+                        sourcemap: 'inline',
+                        minify: false,
+                        outDir: 'dist-electron',
+                        rollupOptions: {
+                            external: ['electron']
+                        }
+                    }
+                }
             }
-          }
+        ]),
+        renderer()
+    ],
+    resolve: {
+        alias: {
+            '@': resolve(__dirname, 'src')
         }
-      },
-      {
-        entry: 'electron/preload.ts',
-        onstart(options) {
-          options.reload()
-        },
-        vite: {
-          build: {
-            sourcemap: 'inline',
-            minify: false,
-            outDir: 'dist-electron',
-            rollupOptions: {
-              external: ['electron']
-            }
-          }
-        }
-      }
-    ]),
-    renderer()
-  ],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src')
+    },
+    build: {
+        outDir: 'dist',
+        emptyOutDir: true
     }
-  },
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true
-  }
 })
